@@ -82,6 +82,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-right: 0.5rem;
 }
 
 .user-info ul li strong {
@@ -89,7 +90,7 @@ body {
   margin-left: 0.5rem;
 }
 
-.repos {
+.repo {
   text-decoration: none;
   background-color: #2a2a72;
   color: #fff;

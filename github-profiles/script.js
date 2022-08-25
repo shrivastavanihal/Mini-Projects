@@ -8,7 +8,22 @@ function getUser(username) {
   return axios
     .get(API_URL + username)
     .then(res => createCard(res))
-    .catch(err => console.log(err));
+    .then(getRepos(username))
+    .catch(err => {
+      if (err.response.status == 404) {
+        createErrorCard("User not exist");
+      }
+    });
+}
+
+function createErrorCard(message) {
+  let errorHTML = `
+    <div class="card">
+        <h1>${message}</h1>
+    </div>
+    `;
+
+  main.innerHTML = errorHTML;
 }
 
 function createCard(user) {
@@ -37,21 +52,37 @@ function createCard(user) {
             ${bio}
           </p>
           <ul>
-            <li>${followers}<strong>Followers</strong></li>
-            <li>${following}<strong>Following</strong></li>
+            <li>${followers} <strong>Followers</strong></li>
+            <li>${following} <strong>Following</strong></li>
             <li>${public_repos} <strong>Repos</strong></li>
           </ul>
 
           <div id="repos">
-            <a href="#" class="repos">Repo 1</a>
-            <a href="#" class="repos">Repo 2</a>
-            <a href="#" class="repos">Repo 3</a>
+           
           </div>
         </div>
       </div>
 `;
-
   main.innerHTML = cardHTML;
+}
+
+function getRepos(username) {
+  return axios
+    .get(API_URL + username + "/repos")
+    .then(repos => addReposToCard(repos.data))
+    .catch(_ => createErrorCard("Problem in fetching repos"));
+}
+
+function addReposToCard(repos) {
+  const reposEl = document.getElementById("repos");
+  repos.slice(0, 8).forEach(repo => {
+    const repoEl = document.createElement("a");
+    repoEl.classList.add("repo");
+    repoEl.href = repo.html_url;
+    repoEl.target = "_blank";
+    repoEl.innerText = repo.name;
+    reposEl.appendChild(repoEl);
+  });
 }
 
 form.addEventListener("submit", e => {
